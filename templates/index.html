@@ -55,7 +55,7 @@
         </div>
 
         <button type="submit">Calculate DC Bias</button>
-        <p class="hint">ใส่ค่าตัวต้านทานเป็น kΩ · ค่าที่คำนวณได้จะแสดงด้านล่าง</p>
+        <p class="hint">ใส่ค่าตัวต้านทานเป็น kΩ · <a href="/">ใช้ค่าตัวอย่างจากใบงาน</a></p>
       </form>
     </section>
 
@@ -145,15 +145,35 @@
             <tr><td>R<sub>TH</sub></td><td>{{ result.rth }}</td><td></td><td></td></tr>
           </tbody>
         </table>
+
+        {% if region != 'cutoff' %}
+        <details class="calc-details">
+          <summary>Calculation details (ค่าที่แทนในสมการ)</summary>
+          <ul>
+            <li>V<sub>TH</sub> = V<sub>CC</sub> · R<sub>2</sub> / (R<sub>1</sub> + R<sub>2</sub>)
+              = {{ form.vcc }} × {{ form.r2 }} / ({{ form.r1 }} + {{ form.r2 }}) = <strong>{{ result.vth }}</strong></li>
+            <li>R<sub>TH</sub> = R<sub>1</sub> R<sub>2</sub> / (R<sub>1</sub> + R<sub>2</sub>) = <strong>{{ result.rth }}</strong></li>
+            <li>I<sub>B</sub> = (V<sub>TH</sub> − V<sub>BE</sub>) / (R<sub>TH</sub> + (β+1) R<sub>E</sub>) = <strong>{{ result.ib }}</strong></li>
+            <li>I<sub>C</sub> = β I<sub>B</sub> = {{ form.beta }} × {{ result.ib }} = <strong>{{ result.ic }}</strong></li>
+            <li>I<sub>E</sub> = (β+1) I<sub>B</sub> = <strong>{{ result.ie }}</strong></li>
+            <li>V<sub>E</sub> = I<sub>E</sub> R<sub>E</sub> = {{ result.ie }} × {{ form.re }} kΩ = <strong>{{ result.ve }}</strong></li>
+            <li>V<sub>B</sub> = V<sub>E</sub> + V<sub>BE</sub> = {{ result.ve }} + {{ form.vbe }} V = <strong>{{ result.vb }}</strong></li>
+            <li>V<sub>C</sub> = V<sub>CC</sub> − I<sub>C</sub> R<sub>C</sub> = {{ form.vcc }} − {{ result.ic }} × {{ form.rc }} kΩ = <strong>{{ result.vc }}</strong></li>
+            <li>V<sub>CE</sub> = V<sub>C</sub> − V<sub>E</sub> = {{ result.vc }} − {{ result.ve }} = <strong>{{ result.vce }}</strong></li>
+          </ul>
+          <p class="hint">ตัวเลขทั้งหมดคำนวณใน <code>dc_bias.py</code> แล้วส่งมาให้ Template แสดงผล</p>
+        </details>
+        {% endif %}
       </section>
     {% endif %}
 
     <section class="card assumptions">
-      <h2>Model Assumptions</h2>
+      <h2>Model Assumptions &amp; Region Limits</h2>
       <ul>
-        <li>Forward-active approximation with constant β และ V<sub>BE</sub></li>
-        <li>ไม่คำนวณ Early effect, leakage, temperature drift หรือ parasitic</li>
-        <li>ผลนอกช่วง Forward-Active (Cutoff/Saturation) เป็นเพียงค่าจากสมการ ไม่ใช่ผลจำลองที่แม่นยำ</li>
+        <li>Forward-active approximation with constant β และ V<sub>BE</sub> (ไม่คำนวณ Early effect, leakage, temperature drift หรือ parasitic)</li>
+        <li><strong>Cutoff</strong> เมื่อ V<sub>TH</sub> ≤ V<sub>BE</sub> → IB = IC = IE = 0, VE = 0, VC = VCE = VCC</li>
+        <li><strong>Saturation</strong> เมื่อ V<sub>CE</sub> &lt; 0.3 V → ค่า IC จาก β·IB สูงกว่าความจริง ต้องอ่าน Warning ก่อนใช้</li>
+        <li>ตัวต้านทานกรอกเป็น kΩ และถูกแปลงเป็น Ω ก่อนคำนวณ; ทุกค่าที่แสดงมีหน่วยกำกับ</li>
       </ul>
     </section>
   </main>

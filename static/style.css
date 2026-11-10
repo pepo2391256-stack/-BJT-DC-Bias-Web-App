@@ -78,7 +78,14 @@ label {
   color: #1b4a6d;
 }
 
+.label-text {
+  display: block;
+  line-height: 1.35;
+}
+
 label .unit {
+  display: inline;
+  margin-left: 4px;
   font-weight: 400;
   color: var(--muted);
   font-size: 12px;

@@ -18,31 +18,38 @@
       <h2>1 · Component Values</h2>
       <form method="post" action="{{ url_for('calculate') }}">
         <div class="grid">
-          <label for="vcc">V<sub>CC</sub><span class="unit">V</span>
+          <label for="vcc">
+            <span class="label-text">V<sub>CC</sub> <span class="unit">V</span></span>
             <input id="vcc" name="vcc" value="{{ form.vcc }}" inputmode="decimal" required>
           </label>
 
-          <label for="r1">R<sub>1</sub> (V<sub>CC</sub> → Base)<span class="unit">kΩ</span>
+          <label for="r1">
+            <span class="label-text">R<sub>1</sub> <span class="unit">kΩ</span></span>
             <input id="r1" name="r1" value="{{ form.r1 }}" inputmode="decimal" required>
           </label>
 
-          <label for="r2">R<sub>2</sub> (Base → GND)<span class="unit">kΩ</span>
+          <label for="r2">
+            <span class="label-text">R<sub>2</sub> <span class="unit">kΩ</span></span>
             <input id="r2" name="r2" value="{{ form.r2 }}" inputmode="decimal" required>
           </label>
 
-          <label for="rc">R<sub>C</sub> (V<sub>CC</sub> → Collector)<span class="unit">kΩ</span>
+          <label for="rc">
+            <span class="label-text">R<sub>C</sub> <span class="unit">kΩ</span></span>
             <input id="rc" name="rc" value="{{ form.rc }}" inputmode="decimal" required>
           </label>
 
-          <label for="re">R<sub>E</sub> (Emitter → GND)<span class="unit">kΩ</span>
+          <label for="re">
+            <span class="label-text">R<sub>E</sub> <span class="unit">kΩ</span></span>
             <input id="re" name="re" value="{{ form.re }}" inputmode="decimal" required>
           </label>
 
-          <label for="beta">β (h<sub>FE</sub>)<span class="unit">—</span>
+          <label for="beta">
+            <span class="label-text">β (h<sub>FE</sub>) <span class="unit">—</span></span>
             <input id="beta" name="beta" value="{{ form.beta }}" inputmode="decimal" required>
           </label>
 
-          <label for="vbe">V<sub>BE</sub><span class="unit">V</span>
+          <label for="vbe">
+            <span class="label-text">V<sub>BE</sub> <span class="unit">V</span></span>
             <input id="vbe" name="vbe" value="{{ form.vbe }}" inputmode="decimal" required>
           </label>
         </div>

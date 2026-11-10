@@ -38,17 +38,30 @@ python -m unittest discover -s tests -v
 .
 ├── app.py                  # Flask routes (HTTP only)
 ├── dc_bias.py              # engineering calculations (no Flask)
-├── templates/index.html    # form and results (Jinja)
+├── templates/index.html    # form, schematic and results (Jinja)
 ├── static/style.css        # presentation
 ├── tests/
 │   ├── test_dc_bias.py     # engineering unit tests
 │   └── test_web.py         # Flask route tests
 ├── docs/
 │   ├── design-note.md
-│   └── validation.md
+│   ├── validation.md
+│   ├── reflection.md
+│   ├── acceptance-checklist.md
+│   ├── test-log.txt
+│   └── screenshot-*.jpeg
 ├── requirements.txt
 └── README.md
 ```
+
+## Screenshots
+
+| State | File |
+|---|---|
+| Input form | `docs/screenshot-input.jpeg` |
+| Forward-active result | `docs/screenshot-result.jpeg` |
+| Validation error (`R1 = 0`) | `docs/screenshot-error.jpeg` |
+| Saturation warning | `docs/screenshot-warning.jpeg` |
 
 ## Inputs and units
 

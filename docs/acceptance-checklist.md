@@ -1,6 +1,6 @@
 # Acceptance Checklist — Lab 02 (A1–A7)
 
-ตรวจเมื่อ: 10 พ.ย. 2026 · Commit: `0a5ddf7` (ก่อนเพิ่มเอกสารชุดนี้)
+ตรวจเมื่อ: 10 พ.ย. 2026 · Commit: `1d6bec0` (push ขึ้น GitHub แล้ว)
 
 | # | เกณฑ์ | สถานะ | หลักฐาน |
 |---|-------|--------|----------|
@@ -10,7 +10,7 @@
 | A4 | R≤0, β≤0, ข้อมูลไม่ใช่ตัวเลข → Error ชัดเจน หน้าไม่ล้ม | ✅ | ภาพ `docs/screenshot-error.jpeg` · HTTP 400 · `ValidationTest` 3 เทสต์ |
 | A5 | เตือนกรณี Cutoff / Saturation | ✅ | ภาพ `docs/screenshot-warning.jpeg` (Saturation, VCE = −0.451 V) · `RegionTest` 2 เทสต์ |
 | A6 | ≥3 Automated Tests ด้าน Engineering + ≥1 Flask test client | ✅ | **14 เทสต์** (10 engineering + 4 web) · `docs/test-log.txt` |
-| A7 | Clone repo แล้วติดตั้ง/รัน/ทดสอบตาม README ได้ | ⏳ | README มีคำสั่งครบ แต่ต้อง **Publish repository** ขึ้น GitHub ก่อนจึงจะ clone ได้ |
+| A7 | Clone repo แล้วติดตั้ง/รัน/ทดสอบตาม README ได้ | ✅ | Push ขึ้น GitHub แล้ว · README มีคำสั่ง venv / flask / unittest ครบ · ทดสอบ `git clone` → รันตาม README ได้ |
 
 ## หลักฐานที่ต้องส่ง Moodle
 

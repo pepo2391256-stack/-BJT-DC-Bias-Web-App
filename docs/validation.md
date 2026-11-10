@@ -49,16 +49,50 @@ python -m unittest discover -s tests -v
 Result:
 
 ```
-Ran 14 tests in 0.067s
+Ran 16 tests in 0.044s
 
 OK
 ```
 
-Breakdown: 10 engineering tests (reference values, Thevenin equivalent,
-cutoff, saturation, three validation cases) and 4 Flask route tests
-(GET form, POST `/calculate`, POST `/`, invalid input).
+Breakdown: 12 engineering tests (reference values, independent nodal model,
+preview approximation, Thevenin equivalent, cutoff, saturation, three
+validation cases) and 4 Flask route tests (GET form, POST `/calculate`,
+POST `/`, invalid input).
 
-## 5. Known limitations
+## 5. Why the illustrative image differs
+
+Section 01B of the lab sheet shows an example result (`VB = 2.20 V`,
+`VE = 1.50 V`, `VC = 8.70 V`, `VCE = 7.20 V`, `IB = 15.1 µA`,
+`IC = 1.50 mA`) and states that the image is illustrative only. Those numbers
+come from the simplified form
+
+```
+VB = VTH = VCC · R2 / (R1 + R2) = 2.164 V ≈ 2.2 V
+IE = (VB − VBE) / RE       IC ≈ IE
+```
+
+which **ignores `RTH` and the base current**. The equations required in
+Section 06 of the same sheet are
+
+```
+IB = (VTH − VBE) / (RTH + (β + 1)RE)
+```
+
+and that is what `dc_bias.py` implements, so the app reports
+`VB = 1.942 V` and `IC = 1.230 mA` for the same components. The two differ by
+about 11 % in `VB`, which is exactly the base-loading error the full model
+removes.
+
+This is verified independently by `IndependentModelTest`, which solves the
+same circuit with nodal analysis instead of the module formulas and must
+agree to numerical precision (`delta = 1e-9`), and by
+`test_preview_approximation_ignores_base_loading`, which asserts
+`VTH = 2.164 V` while the module result is `VB = 1.942 V`.
+
+The app deliberately keeps the physics of Section 06 instead of being tuned to
+match the picture, and the page states this next to the assumptions.
+
+## 6. Known limitations
 
 - Saturation values are produced by the forward-active equations and
   overestimate `IC`; the warning states this explicitly.

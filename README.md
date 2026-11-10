@@ -115,7 +115,7 @@ accurate.
 | Brainstorm + Planning มีขอบเขตสมเหตุสมผล | 1 | `docs/design-note.md`, `docs/implementation-plan.md` |
 | Flask Web App เปิดผ่าน Browser รับ/แสดงผลได้ (multi-file/backend) | 3 | `app.py`, `dc_bias.py`, `templates/`, `static/`, `docs/screenshot-result.jpeg` |
 | DC Bias ถูกหลักวงจร มีหน่วยและสมมติฐานชัดเจน | 2 | `docs/validation.md`, ตารางผล + `Calculation details` + `Model Assumptions & Region Limits` บนหน้าเว็บ |
-| Automated Tests + Input Validation + Warning | 2 | `tests/` (14 เทสต์), `docs/test-log.txt`, `docs/screenshot-error.jpeg`, `docs/screenshot-warning.jpeg` |
+| Automated Tests + Input Validation + Warning | 2 | `tests/` (16 เทสต์), `docs/test-log.txt`, `docs/screenshot-error.jpeg`, `docs/screenshot-warning.jpeg` |
 | Review Code, GitHub Commit/Push, README, Reflection | 2 | `docs/code-review.md`, `docs/acceptance-checklist.md`, `docs/reflection.md`, commit history |
 
 ## Submission

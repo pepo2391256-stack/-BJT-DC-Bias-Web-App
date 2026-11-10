@@ -60,6 +60,50 @@ class RegionTest(unittest.TestCase):
         self.assertIsNotNone(result.warning)
 
 
+class IndependentModelTest(unittest.TestCase):
+    """Solve the same circuit with nodal equations instead of the module formulas."""
+
+    def _nodal_solution(self, vcc, r1, r2, rc, re, beta, vbe):
+        # Resistances in ohm, voltages in volt.
+        k = (beta + 1.0) * re
+        ib = ((vcc - vbe) / r1 - vbe / r2) / (1.0 + k / r1 + k / r2)
+        vb = vbe + k * ib
+        ve = vb - vbe
+        ic = beta * ib
+        ie = (beta + 1.0) * ib
+        vc = vcc - ic * rc
+        vce = vc - ve
+        return dict(ib=ib, ic=ic, ie=ie, vb=vb, ve=ve, vc=vc, vce=vce)
+
+    def test_nodal_solution_matches_module(self):
+        result = calculate_dc_bias(
+            vcc=12, r1=100, r2=22, rc=2.2, re=1, beta=100, vbe=0.70
+        )
+        nodal = self._nodal_solution(
+            12.0, 100_000.0, 22_000.0, 2_200.0, 1_000.0, 100.0, 0.70
+        )
+
+        self.assertAlmostEqual(result.ib, nodal["ib"], delta=1e-9)
+        self.assertAlmostEqual(result.ic, nodal["ic"], delta=1e-9)
+        self.assertAlmostEqual(result.ie, nodal["ie"], delta=1e-9)
+        self.assertAlmostEqual(result.vb, nodal["vb"], delta=1e-9)
+        self.assertAlmostEqual(result.ve, nodal["ve"], delta=1e-9)
+        self.assertAlmostEqual(result.vc, nodal["vc"], delta=1e-9)
+        self.assertAlmostEqual(result.vce, nodal["vce"], delta=1e-9)
+
+    def test_preview_approximation_ignores_base_loading(self):
+        """The illustrative image in the lab sheet sets VB = VTH (no base current)."""
+        vcc, r1, r2 = 12.0, 100_000.0, 22_000.0
+        vth = vcc * r2 / (r1 + r2)  # 2.164 V, the value used by the preview
+        result = calculate_dc_bias(
+            vcc=12, r1=100, r2=22, rc=2.2, re=1, beta=100, vbe=0.70
+        )
+
+        self.assertAlmostEqual(vth, 2.164, places=3)
+        self.assertLess(result.vb, vth)  # base current loads the divider
+        self.assertAlmostEqual(result.vb, 1.942, places=3)
+
+
 class ValidationTest(unittest.TestCase):
     def test_zero_resistance_is_rejected(self):
         with self.assertRaises(ValidationError):

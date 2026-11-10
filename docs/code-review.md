@@ -12,7 +12,7 @@
 | หน่วย | ผ่าน | ทุกค่าที่แสดงมี V / mA / µA / kΩ |
 | Validation | ผ่าน | R≤0, β≤0, ค่าไม่ใช่ตัวเลข → HTTP 400 + ข้อความ |
 | Warning | ผ่าน | Cutoff (VTH ≤ VBE) และ Saturation (VCE < 0.3 V) |
-| Tests | ผ่าน | 14 เทสต์ (10 engineering + 4 HTTP) |
+| Tests | ผ่าน | 16 เทสต์ (12 engineering + 4 HTTP) |
 | ความปลอดภัยเบื้องต้น | ผ่าน | ไม่มี secret, `.venv/` และ `.env` ถูก ignore |
 | UI | ผ่านหลังแก้ | พบ bug แล้วแก้ (ข้อ 1 ด้านล่าง) |
 
@@ -47,7 +47,7 @@
 
 ```bash
 python -m unittest discover -s tests -v
-# Ran 14 tests — OK
+# Ran 16 tests — OK
 ```
 
 ภาพหน้าจอ: `docs/screenshot-result.jpeg`, `docs/screenshot-error.jpeg`,

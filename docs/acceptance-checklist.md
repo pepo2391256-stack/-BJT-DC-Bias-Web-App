@@ -9,7 +9,7 @@
 | A3 | ค่าตรงกับการคำนวณอิสระภายใต้แบบจำลองเดียวกัน | ✅ | ตารางคำนวณมือใน `docs/validation.md` · `tests/test_dc_bias.py` |
 | A4 | R≤0, β≤0, ข้อมูลไม่ใช่ตัวเลข → Error ชัดเจน หน้าไม่ล้ม | ✅ | ภาพ `docs/screenshot-error.jpeg` · HTTP 400 · `ValidationTest` 3 เทสต์ |
 | A5 | เตือนกรณี Cutoff / Saturation | ✅ | ภาพ `docs/screenshot-warning.jpeg` (Saturation, VCE = −0.451 V) · `RegionTest` 2 เทสต์ |
-| A6 | ≥3 Automated Tests ด้าน Engineering + ≥1 Flask test client | ✅ | **14 เทสต์** (10 engineering + 4 web) · `docs/test-log.txt` |
+| A6 | ≥3 Automated Tests ด้าน Engineering + ≥1 Flask test client | ✅ | **16 เทสต์** (12 engineering + 4 web) · `docs/test-log.txt` |
 | A7 | Clone repo แล้วติดตั้ง/รัน/ทดสอบตาม README ได้ | ✅ | Push ขึ้น GitHub แล้ว · README มีคำสั่ง venv / flask / unittest ครบ · ทดสอบ `git clone` → รันตาม README ได้ |
 
 ## หลักฐานที่ต้องส่ง Moodle

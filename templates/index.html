@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BJT DC Bias Calculator · ENG29 2121</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="hero">
+    <p class="eyebrow">ENG29 2121 · LAB 02</p>
+    <h1>BJT Common-Emitter DC Bias</h1>
+    <p class="subtitle">Voltage-Divider Bias · Forward-Active Approximation</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>1 · Component Values</h2>
+      <form method="post" action="{{ url_for('calculate') }}">
+        <div class="grid">
+          <label for="vcc">V<sub>CC</sub><span class="unit">V</span>
+            <input id="vcc" name="vcc" value="{{ form.vcc }}" inputmode="decimal" required>
+          </label>
+
+          <label for="r1">R<sub>1</sub> (V<sub>CC</sub> → Base)<span class="unit">kΩ</span>
+            <input id="r1" name="r1" value="{{ form.r1 }}" inputmode="decimal" required>
+          </label>
+
+          <label for="r2">R<sub>2</sub> (Base → GND)<span class="unit">kΩ</span>
+            <input id="r2" name="r2" value="{{ form.r2 }}" inputmode="decimal" required>
+          </label>
+
+          <label for="rc">R<sub>C</sub> (V<sub>CC</sub> → Collector)<span class="unit">kΩ</span>
+            <input id="rc" name="rc" value="{{ form.rc }}" inputmode="decimal" required>
+          </label>
+
+          <label for="re">R<sub>E</sub> (Emitter → GND)<span class="unit">kΩ</span>
+            <input id="re" name="re" value="{{ form.re }}" inputmode="decimal" required>
+          </label>
+
+          <label for="beta">β (h<sub>FE</sub>)<span class="unit">—</span>
+            <input id="beta" name="beta" value="{{ form.beta }}" inputmode="decimal" required>
+          </label>
+
+          <label for="vbe">V<sub>BE</sub><span class="unit">V</span>
+            <input id="vbe" name="vbe" value="{{ form.vbe }}" inputmode="decimal" required>
+          </label>
+        </div>
+
+        <button type="submit">Calculate DC Bias</button>
+        <p class="hint">ใส่ค่าตัวต้านทานเป็น kΩ · ค่าที่คำนวณได้จะแสดงด้านล่าง</p>
+      </form>
+    </section>
+
+    <section class="card schematic-card">
+      <h2>Circuit · Voltage-Divider Bias</h2>
+      <figure class="schematic">
+        <svg viewBox="0 0 460 330" role="img" aria-labelledby="sch-title">
+          <title id="sch-title">NPN BJT common-emitter amplifier with voltage-divider bias</title>
+          <g fill="none" stroke="#17344b" stroke-width="2" stroke-linecap="round">
+            <!-- VCC rail -->
+            <line x1="60" y1="30" x2="400" y2="30"/>
+            <!-- R1 branch -->
+            <line x1="150" y1="30" x2="150" y2="60"/>
+            <rect x="138" y="60" width="24" height="70" rx="2"/>
+            <line x1="150" y1="130" x2="150" y2="190"/>
+            <!-- R2 branch -->
+            <rect x="138" y="210" width="24" height="70" rx="2"/>
+            <line x1="150" y1="280" x2="150" y2="300"/>
+            <!-- ground rail -->
+            <line x1="110" y1="300" x2="300" y2="300"/>
+            <line x1="130" y1="308" x2="170" y2="308"/>
+            <line x1="140" y1="316" x2="160" y2="316"/>
+            <!-- base lead -->
+            <line x1="150" y1="190" x2="228" y2="190"/>
+            <!-- transistor body -->
+            <circle cx="250" cy="190" r="42"/>
+            <line x1="228" y1="165" x2="228" y2="215" stroke-width="3"/>
+            <!-- collector -->
+            <line x1="250" y1="148" x2="250" y2="90"/>
+            <line x1="250" y1="90" x2="340" y2="90"/>
+            <line x1="340" y1="90" x2="340" y2="70"/>
+            <!-- RC -->
+            <rect x="328" y="35" width="24" height="35" rx="2"/>
+            <line x1="340" y1="30" x2="340" y2="35"/>
+            <!-- emitter -->
+            <line x1="250" y1="232" x2="250" y2="250"/>
+            <rect x="238" y="250" width="24" height="35" rx="2"/>
+            <line x1="250" y1="285" x2="250" y2="300"/>
+          </g>
+          <!-- emitter arrow -->
+          <path d="M 250 232 L 264 218 L 264 246 Z" fill="#17344b"/>
+          <g fill="#17344b" font-family="Tahoma, Arial, sans-serif" font-size="13">
+            <text x="64" y="20" font-weight="700">VCC</text>
+            <text x="172" y="100">R1</text>
+            <text x="172" y="250">R2</text>
+            <text x="356" y="58">RC</text>
+            <text x="270" y="272">RE</text>
+            <text x="212" y="160" font-size="11">B</text>
+            <text x="258" y="138" font-size="11">C</text>
+            <text x="258" y="244" font-size="11">E</text>
+            <text x="300" y="200" font-weight="700">Q1</text>
+          </g>
+        </svg>
+        <figcaption>R1 จาก VCC ไป Base · R2 จาก Base ลง Ground · RC จาก VCC ไป Collector · RE จาก Emitter ลง Ground</figcaption>
+      </figure>
+    </section>
+
+    {% if errors %}
+    <section class="alert error" role="alert">
+      <h2>ตรวจสอบข้อมูลอีกครั้ง</h2>
+      <ul>
+        {% for message in errors %}<li>{{ message }}</li>{% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    {% if result %}
+      {% if warning %}
+      <section class="alert warning" role="status">
+        <strong>⚠ คำเตือน:</strong> {{ warning }}
+      </section>
+      {% endif %}
+
+      <section class="card">
+        <h2>2 · DC Operating Point</h2>
+        <p class="region region-{{ region }}">{{ region_label }}</p>
+
+        <table>
+          <thead>
+            <tr><th>Quantity</th><th>Value</th><th>Quantity</th><th>Value</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>V<sub>B</sub></td><td>{{ result.vb }}</td><td>I<sub>B</sub></td><td>{{ result.ib }}</td></tr>
+            <tr><td>V<sub>E</sub></td><td>{{ result.ve }}</td><td>I<sub>C</sub></td><td>{{ result.ic }}</td></tr>
+            <tr><td>V<sub>C</sub></td><td>{{ result.vc }}</td><td>I<sub>E</sub></td><td>{{ result.ie }}</td></tr>
+            <tr><td>V<sub>CE</sub></td><td>{{ result.vce }}</td><td>V<sub>TH</sub></td><td>{{ result.vth }}</td></tr>
+            <tr><td>R<sub>TH</sub></td><td>{{ result.rth }}</td><td></td><td></td></tr>
+          </tbody>
+        </table>
+      </section>
+    {% endif %}
+
+    <section class="card assumptions">
+      <h2>Model Assumptions</h2>
+      <ul>
+        <li>Forward-active approximation with constant β และ V<sub>BE</sub></li>
+        <li>ไม่คำนวณ Early effect, leakage, temperature drift หรือ parasitic</li>
+        <li>ผลนอกช่วง Forward-Active (Cutoff/Saturation) เป็นเพียงค่าจากสมการ ไม่ใช่ผลจำลองที่แม่นยำ</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>ENG29 2121 · Lab 02 · Flask + Python Backend · ค่าทั้งหมดคำนวณจากฝั่ง Server</footer>
+</body>
+</html>

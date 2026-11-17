@@ -8,65 +8,54 @@
 </head>
 <body>
   <header class="hero">
-    <p class="eyebrow">ENG29 2121 · LAB 02</p>
+    <p class="eyebrow">ENG29 2121 · LAB 02 + LAB 03</p>
     <h1>BJT Common-Emitter DC Bias</h1>
-    <p class="subtitle">Voltage-Divider Bias · Forward-Active Approximation</p>
+    <p class="subtitle">{{ mode_label }} · Forward-Active Approximation</p>
   </header>
 
   <main>
     <section class="card">
-      <h2>1 · Component Values</h2>
-      <form method="post" action="{{ url_for('calculate') }}">
+      <h2>1 · เลือกวงจรไบอัส</h2>
+      <form method="get" action="{{ url_for('index') }}" class="mode-picker">
+        <label for="mode">
+          <span class="label-text">โหมด</span>
+          <select id="mode" name="mode">
+            {% for key, label in mode_labels.items() %}
+            <option value="{{ key }}" {% if key == mode %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <button type="submit" class="ghost">เปลี่ยนโหมด</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>2 · Component Values · {{ mode_label }}</h2>
+      <form method="post" action="{{ url_for('calculate_route') }}">
+        <input type="hidden" name="mode" value="{{ mode }}">
         <div class="grid">
-          <label for="vcc">
-            <span class="label-text">V<sub>CC</sub> <span class="unit">V</span></span>
-            <input id="vcc" name="vcc" value="{{ form.vcc }}" inputmode="decimal" required>
+          {% for name, label, unit in fields %}
+          <label for="{{ name }}">
+            <span class="label-text">{{ label|safe }} <span class="unit">{{ unit }}</span></span>
+            <input id="{{ name }}" name="{{ name }}" value="{{ form[name] }}" inputmode="decimal" required>
           </label>
-
-          <label for="r1">
-            <span class="label-text">R<sub>1</sub> <span class="unit">kΩ</span></span>
-            <input id="r1" name="r1" value="{{ form.r1 }}" inputmode="decimal" required>
-          </label>
-
-          <label for="r2">
-            <span class="label-text">R<sub>2</sub> <span class="unit">kΩ</span></span>
-            <input id="r2" name="r2" value="{{ form.r2 }}" inputmode="decimal" required>
-          </label>
-
-          <label for="rc">
-            <span class="label-text">R<sub>C</sub> <span class="unit">kΩ</span></span>
-            <input id="rc" name="rc" value="{{ form.rc }}" inputmode="decimal" required>
-          </label>
-
-          <label for="re">
-            <span class="label-text">R<sub>E</sub> <span class="unit">kΩ</span></span>
-            <input id="re" name="re" value="{{ form.re }}" inputmode="decimal" required>
-          </label>
-
-          <label for="beta">
-            <span class="label-text">β (h<sub>FE</sub>) <span class="unit">—</span></span>
-            <input id="beta" name="beta" value="{{ form.beta }}" inputmode="decimal" required>
-          </label>
-
-          <label for="vbe">
-            <span class="label-text">V<sub>BE</sub> <span class="unit">V</span></span>
-            <input id="vbe" name="vbe" value="{{ form.vbe }}" inputmode="decimal" required>
-          </label>
+          {% endfor %}
         </div>
 
         <button type="submit">Calculate DC Bias</button>
-        <p class="hint">ใส่ค่าตัวต้านทานเป็น kΩ · <a href="/">ใช้ค่าตัวอย่างจากใบงาน</a></p>
+        <p class="hint">ใส่ค่าตัวต้านทานเป็น kΩ · <a href="{{ url_for('index', mode=mode) }}">ใช้ค่าตัวอย่าง</a></p>
       </form>
     </section>
 
     <section class="card schematic-card">
-      <h2>Circuit · Voltage-Divider Bias</h2>
+      <h2>Circuit · {{ mode_label }}</h2>
       <figure class="schematic">
         <svg viewBox="0 0 460 330" role="img" aria-labelledby="sch-title">
-          <title id="sch-title">NPN BJT common-emitter amplifier with voltage-divider bias</title>
+          <title id="sch-title">NPN BJT common-emitter amplifier with {{ mode_label }}</title>
           <g fill="none" stroke="#17344b" stroke-width="2" stroke-linecap="round">
             <!-- VCC rail -->
             <line x1="60" y1="30" x2="400" y2="30"/>
+            {% if mode == 'divider' %}
             <!-- R1 branch -->
             <line x1="150" y1="30" x2="150" y2="60"/>
             <rect x="138" y="60" width="24" height="70" rx="2"/>
@@ -74,6 +63,12 @@
             <!-- R2 branch -->
             <rect x="138" y="210" width="24" height="70" rx="2"/>
             <line x1="150" y1="280" x2="150" y2="300"/>
+            {% else %}
+            <!-- RB from VCC to base -->
+            <line x1="150" y1="30" x2="150" y2="60"/>
+            <rect x="138" y="60" width="24" height="70" rx="2"/>
+            <line x1="150" y1="130" x2="150" y2="190"/>
+            {% endif %}
             <!-- ground rail -->
             <line x1="110" y1="300" x2="300" y2="300"/>
             <line x1="130" y1="308" x2="170" y2="308"/>
@@ -92,30 +87,46 @@
             <line x1="340" y1="30" x2="340" y2="35"/>
             <!-- emitter -->
             <line x1="250" y1="232" x2="250" y2="250"/>
+            {% if mode == 'fixed' %}
+            <line x1="250" y1="250" x2="250" y2="300"/>
+            {% else %}
             <rect x="238" y="250" width="24" height="35" rx="2"/>
             <line x1="250" y1="285" x2="250" y2="300"/>
+            {% endif %}
           </g>
           <!-- emitter arrow -->
           <path d="M 250 232 L 264 218 L 264 246 Z" fill="#17344b"/>
           <g fill="#17344b" font-family="Tahoma, Arial, sans-serif" font-size="13">
             <text x="64" y="20" font-weight="700">VCC</text>
+            {% if mode == 'divider' %}
             <text x="172" y="100">R1</text>
             <text x="172" y="250">R2</text>
+            {% else %}
+            <text x="172" y="100">RB</text>
+            {% endif %}
             <text x="356" y="58">RC</text>
-            <text x="270" y="272">RE</text>
+            {% if mode != 'fixed' %}<text x="270" y="272">RE</text>{% endif %}
             <text x="212" y="160" font-size="11">B</text>
             <text x="258" y="138" font-size="11">C</text>
             <text x="258" y="244" font-size="11">E</text>
             <text x="300" y="200" font-weight="700">Q1</text>
           </g>
         </svg>
-        <figcaption>R1 จาก VCC ไป Base · R2 จาก Base ลง Ground · RC จาก VCC ไป Collector · RE จาก Emitter ลง Ground</figcaption>
+        <figcaption>
+          {% if mode == 'divider' %}
+          R1 จาก VCC ไป Base · R2 จาก Base ลง Ground · RC จาก VCC ไป Collector · RE จาก Emitter ลง Ground
+          {% elif mode == 'fixed' %}
+          RB จาก VCC ไป Base · Emitter ต่อลง Ground โดยตรง · RC จาก VCC ไป Collector
+          {% else %}
+          RB จาก VCC ไป Base · RE จาก Emitter ลง Ground · RC จาก VCC ไป Collector
+          {% endif %}
+        </figcaption>
       </figure>
     </section>
 
     {% if errors %}
     <section class="alert error" role="alert">
-      <h2>ตรวจสอบข้อมูลอีกครั้ง</h2>
+      <h2>ตรวจสอบข้อมูลอีกครั้ง · {{ mode_label }}</h2>
       <ul>
         {% for message in errors %}<li>{{ message }}</li>{% endfor %}
       </ul>
@@ -130,7 +141,7 @@
       {% endif %}
 
       <section class="card">
-        <h2>2 · DC Operating Point</h2>
+        <h2>3 · DC Operating Point · {{ mode_label }}</h2>
         <p class="region region-{{ region }}">{{ region_label }}</p>
 
         <table>
@@ -141,25 +152,28 @@
             <tr><td>V<sub>B</sub></td><td>{{ result.vb }}</td><td>I<sub>B</sub></td><td>{{ result.ib }}</td></tr>
             <tr><td>V<sub>E</sub></td><td>{{ result.ve }}</td><td>I<sub>C</sub></td><td>{{ result.ic }}</td></tr>
             <tr><td>V<sub>C</sub></td><td>{{ result.vc }}</td><td>I<sub>E</sub></td><td>{{ result.ie }}</td></tr>
-            <tr><td>V<sub>CE</sub></td><td>{{ result.vce }}</td><td>V<sub>TH</sub></td><td>{{ result.vth }}</td></tr>
+            <tr><td>V<sub>CE</sub></td><td>{{ result.vce }}</td>
+              {% if result.vth %}
+              <td>V<sub>TH</sub></td><td>{{ result.vth }}</td>
+              {% else %}
+              <td></td><td></td>
+              {% endif %}
+            </tr>
+            {% if result.rth %}
             <tr><td>R<sub>TH</sub></td><td>{{ result.rth }}</td><td></td><td></td></tr>
+            {% endif %}
           </tbody>
         </table>
 
         {% if region != 'cutoff' %}
         <details class="calc-details">
-          <summary>Calculation details (ค่าที่แทนในสมการ)</summary>
+          <summary>ค่าที่ใช้และผลลัพธ์ (Calculation summary)</summary>
           <ul>
-            <li>V<sub>TH</sub> = V<sub>CC</sub> · R<sub>2</sub> / (R<sub>1</sub> + R<sub>2</sub>)
-              = {{ form.vcc }} × {{ form.r2 }} / ({{ form.r1 }} + {{ form.r2 }}) = <strong>{{ result.vth }}</strong></li>
-            <li>R<sub>TH</sub> = R<sub>1</sub> R<sub>2</sub> / (R<sub>1</sub> + R<sub>2</sub>) = <strong>{{ result.rth }}</strong></li>
-            <li>I<sub>B</sub> = (V<sub>TH</sub> − V<sub>BE</sub>) / (R<sub>TH</sub> + (β+1) R<sub>E</sub>) = <strong>{{ result.ib }}</strong></li>
-            <li>I<sub>C</sub> = β I<sub>B</sub> = {{ form.beta }} × {{ result.ib }} = <strong>{{ result.ic }}</strong></li>
-            <li>I<sub>E</sub> = (β+1) I<sub>B</sub> = <strong>{{ result.ie }}</strong></li>
-            <li>V<sub>E</sub> = I<sub>E</sub> R<sub>E</sub> = {{ result.ie }} × {{ form.re }} kΩ = <strong>{{ result.ve }}</strong></li>
-            <li>V<sub>B</sub> = V<sub>E</sub> + V<sub>BE</sub> = {{ result.ve }} + {{ form.vbe }} V = <strong>{{ result.vb }}</strong></li>
-            <li>V<sub>C</sub> = V<sub>CC</sub> − I<sub>C</sub> R<sub>C</sub> = {{ form.vcc }} − {{ result.ic }} × {{ form.rc }} kΩ = <strong>{{ result.vc }}</strong></li>
-            <li>V<sub>CE</sub> = V<sub>C</sub> − V<sub>E</sub> = {{ result.vc }} − {{ result.ve }} = <strong>{{ result.vce }}</strong></li>
+            {% for name, label, unit in fields %}
+            <li>{{ label|safe }} = {{ form[name] }} {{ unit }}</li>
+            {% endfor %}
+            <li>I<sub>B</sub> = <strong>{{ result.ib }}</strong> · I<sub>C</sub> = <strong>{{ result.ic }}</strong> · I<sub>E</sub> = <strong>{{ result.ie }}</strong></li>
+            <li>V<sub>B</sub> = <strong>{{ result.vb }}</strong> · V<sub>E</sub> = <strong>{{ result.ve }}</strong> · V<sub>C</sub> = <strong>{{ result.vc }}</strong> · V<sub>CE</sub> = <strong>{{ result.vce }}</strong></li>
           </ul>
           <p class="hint">ตัวเลขทั้งหมดคำนวณใน <code>dc_bias.py</code> แล้วส่งมาให้ Template แสดงผล</p>
         </details>
@@ -171,14 +185,16 @@
       <h2>Model Assumptions &amp; Region Limits</h2>
       <ul>
         <li>Forward-active approximation with constant β และ V<sub>BE</sub> (ไม่คำนวณ Early effect, leakage, temperature drift หรือ parasitic)</li>
-        <li><strong>Cutoff</strong> เมื่อ V<sub>TH</sub> ≤ V<sub>BE</sub> → IB = IC = IE = 0, VE = 0, VC = VCE = VCC</li>
+        <li><strong>Fixed Bias</strong>: R<sub>B</sub> จาก VCC ไป Base, Emitter ต่อลง Ground → V<sub>E</sub> = 0 V</li>
+        <li><strong>Emitter Bias</strong>: R<sub>B</sub> จาก VCC ไป Base, R<sub>E</sub> จาก Emitter ลง Ground</li>
+        <li><strong>Voltage Divider Bias</strong>: R<sub>1</sub>, R<sub>2</sub> แบ่งแรงดันที่ Base, R<sub>E</sub> จาก Emitter ลง Ground</li>
+        <li><strong>Cutoff</strong> เมื่อแรงดันที่ฐานจากแหล่งจ่าย (VCC หรือ V<sub>TH</sub>) ≤ V<sub>BE</sub> → IB = IC = IE = 0</li>
         <li><strong>Saturation</strong> เมื่อ V<sub>CE</sub> &lt; 0.3 V → ค่า IC จาก β·IB สูงกว่าความจริง ต้องอ่าน Warning ก่อนใช้</li>
         <li>ตัวต้านทานกรอกเป็น kΩ และถูกแปลงเป็น Ω ก่อนคำนวณ; ทุกค่าที่แสดงมีหน่วยกำกับ</li>
-        <li><strong>ค่าตัวอย่างในใบงาน (VB 2.20 V, VE 1.50 V) เป็นเพียงภาพประกอบ</strong> ซึ่งใช้ V<sub>B</sub> = V<sub>TH</sub> โดยไม่คิด R<sub>TH</sub> และกระแสเบส; โปรแกรมนี้ใช้สมการเต็มในข้อ 06 จึงได้ VB ≈ 1.94 V</li>
       </ul>
     </section>
   </main>
 
-  <footer>ENG29 2121 · Lab 02 · Flask + Python Backend · ค่าทั้งหมดคำนวณจากฝั่ง Server</footer>
+  <footer>ENG29 2121 · Lab 02 + Lab 03 · Flask + Python Backend · ค่าทั้งหมดคำนวณจากฝั่ง Server</footer>
 </body>
 </html>

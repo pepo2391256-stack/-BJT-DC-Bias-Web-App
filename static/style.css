@@ -91,7 +91,8 @@ label .unit {
   font-size: 12px;
 }
 
-input {
+input,
+select {
   width: 100%;
   padding: 9px 11px;
   border: 1px solid #b9cddd;
@@ -101,10 +102,21 @@ input {
   background: #fbfdff;
 }
 
-input:focus {
+input:focus,
+select:focus {
   outline: 2px solid #7db7d8;
   border-color: var(--blue);
 }
+
+.mode-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  align-items: flex-end;
+}
+
+.mode-picker label { flex: 1 1 260px; }
+.mode-picker button { margin-top: 0; }
 
 button {
   margin-top: 20px;
@@ -119,6 +131,14 @@ button {
 }
 
 button:hover { background: #0a6a63; }
+
+button.ghost {
+  background: #fff;
+  color: #1b4a6d;
+  border: 1px solid #b9cddd;
+}
+
+button.ghost:hover { background: #eef5fa; }
 
 .hint {
   margin: 10px 0 0;

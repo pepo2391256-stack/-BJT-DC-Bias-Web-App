@@ -1,10 +1,17 @@
 # BJT DC Bias Web App
 
 Flask web application for the DC operating point of an NPN BJT
-common-emitter amplifier with **voltage-divider bias**.
+common-emitter amplifier with three single-supply bias circuits:
 
-The browser shows the component form; the Python backend performs every
-calculation. Nothing is hard-coded in the HTML.
+| Mode | Inputs | Resistor placement |
+|---|---|---|
+| **Fixed Bias** | RB | RB from VCC to base, emitter grounded |
+| **Emitter Bias** | RB, RE | RB from VCC to base, RE from emitter to ground |
+| **Voltage Divider Bias** | R1, R2, RE | R1 from VCC to base, R2 from base to ground, RE from emitter to ground |
+
+The browser shows the component form and the circuit for the selected mode;
+the Python backend performs every calculation. Nothing is hard-coded in the
+HTML and the templates contain no equations.
 
 ## Requirements
 
@@ -41,7 +48,8 @@ python -m unittest discover -s tests -v
 ├── templates/index.html    # form, schematic and results (Jinja)
 ├── static/style.css        # presentation
 ├── tests/
-│   ├── test_dc_bias.py     # engineering unit tests
+│   ├── test_dc_bias.py     # engineering unit tests (divider + regions)
+│   ├── test_bias_modes.py  # fixed / emitter / dispatch tests
 │   └── test_web.py         # Flask route tests
 ├── docs/
 │   ├── design-note.md
@@ -65,38 +73,45 @@ python -m unittest discover -s tests -v
 
 ## Inputs and units
 
-| Input | Unit |
-|-------|------|
-| VCC   | V    |
-| R1, R2, RC, RE | kΩ |
-| β (hFE) | — |
-| VBE   | V    |
+| Input | Unit | Used by |
+|-------|------|---------|
+| VCC   | V    | every mode |
+| RC    | kΩ   | every mode |
+| β (hFE) | —  | every mode |
+| VBE   | V    | every mode |
+| RB    | kΩ   | Fixed Bias, Emitter Bias |
+| R1, R2 | kΩ  | Voltage Divider Bias |
+| RE    | kΩ   | Emitter Bias, Voltage Divider Bias |
 
-Resistances are converted to ohms before the calculation.
+The form only shows the inputs the selected mode needs; resistances are
+converted to ohms inside `dc_bias.py` before the calculation.
 
 ## Model
 
 Forward-active approximation with constant β and constant VBE:
 
 ```
-VTH = VCC · R2 / (R1 + R2)
-RTH = R1 · R2 / (R1 + R2)
-IB  = (VTH − VBE) / (RTH + (β + 1) · RE)
-IC  = β · IB
-IE  = (β + 1) · IB
-VE  = IE · RE
+IB = (VCC − VBE) / RB                                  (fixed)
+IB = (VCC − VBE) / (RB + (β + 1) RE)                    (emitter)
+VTH = VCC R2 / (R1 + R2), RTH = R1 R2 / (R1 + R2)
+IB = (VTH − VBE) / (RTH + (β + 1) RE)                   (divider)
+
+IC  = β IB
+IE  = (β + 1) IB
+VE  = IE RE            (0 V for fixed bias)
 VB  = VE + VBE
-VC  = VCC − IC · RC
+VC  = VCC − IC RC
 VCE = VC − VE
 ```
 
 ## Validation and warnings
 
-- `VCC`, `R1`, `R2`, `RC`, `RE`, `β` must be numeric and greater than zero.
+- `VCC`, `RB`, `R1`, `R2`, `RC`, `RE`, `β` must be numeric and greater than zero.
 - `VBE` must be numeric and not negative.
-- `VTH ≤ VBE` → **Cutoff**: `IB = IC = IE = 0`, `VE = 0`, `VB = VTH`,
-  `VC = VCE = VCC`, with a warning that the forward-active equations do not
-  apply.
+- An unknown mode is a validation error; it never falls back to the divider.
+- The base-drive voltage (`VCC` for fixed/emitter, `VTH` for divider) at or
+  below `VBE` → **Cutoff**: `IB = IC = IE = 0`, `VE = 0`, `VC = VCE = VCC`,
+  with a warning that the forward-active equations do not apply.
 - `VCE < 0.3 V` → **Saturation** warning. The numbers are still shown, but
   they come from the forward-active equations and overestimate the real
   collector current.

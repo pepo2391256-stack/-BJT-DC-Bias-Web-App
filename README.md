@@ -53,11 +53,16 @@ python -m unittest discover -s tests -v
 │   └── test_web.py         # Flask route tests
 ├── docs/
 │   ├── design-note.md
+│   ├── implementation-plan.md
 │   ├── validation.md
+│   ├── code-review.md
 │   ├── reflection.md
 │   ├── acceptance-checklist.md
 │   ├── test-log.txt
-│   └── screenshot-*.jpeg
+│   ├── screenshot-*.jpeg
+│   ├── lab03-acceptance.md      # Lab 03 · ผลทดสอบ A1–A5 + ค่าอ้างอิง
+│   └── lab03/                   # ภาพหลักฐาน 5 กรณีจากเบราว์เซอร์จริง
+│       └── A1..A5-*.jpeg
 ├── requirements.txt
 └── README.md
 ```
@@ -70,6 +75,20 @@ python -m unittest discover -s tests -v
 | Forward-active result | `docs/screenshot-result.jpeg` |
 | Validation error (`R1 = 0`) | `docs/screenshot-error.jpeg` |
 | Saturation warning | `docs/screenshot-warning.jpeg` |
+
+### Lab 03 — three bias modes verified in a real browser
+
+Full table, reference values and notes: [`docs/lab03-acceptance.md`](docs/lab03-acceptance.md)
+
+| Case | Mode / inputs | I_C | V_CE | Evidence |
+|---|---|---|---|---|
+| A1 | Voltage Divider · R1=100, R2=22, RE=1 kΩ | 1.230 mA | 8.052 V | [A1](docs/lab03/A1-divider.jpeg) |
+| A2 | Fixed · RB=1000 kΩ | 1.130 mA | 9.514 V | [A2](docs/lab03/A2-fixed.jpeg) |
+| A3 | Emitter · RB=1000 kΩ, RE=1 kΩ | 1.026 mA | 8.705 V | [A3](docs/lab03/A3-emitter-re1k.jpeg) |
+| A4 | Emitter · RB=1000 kΩ, RE=2 kΩ | 0.940 mA | 8.033 V | [A4](docs/lab03/A4-emitter-re2k.jpeg) |
+| A5 | Fixed · RB=0 (invalid) | — | — | [A5](docs/lab03/A5-fixed-rb0-error.jpeg) · HTTP 400 |
+
+Acceptance rule: |ΔI_C| ≤ 0.01 mA and |ΔV_CE| ≤ 0.02 V against hand calculations.
 
 ## Inputs and units
 
@@ -130,10 +149,14 @@ accurate.
 | Brainstorm + Planning มีขอบเขตสมเหตุสมผล | 1 | `docs/design-note.md`, `docs/implementation-plan.md` |
 | Flask Web App เปิดผ่าน Browser รับ/แสดงผลได้ (multi-file/backend) | 3 | `app.py`, `dc_bias.py`, `templates/`, `static/`, `docs/screenshot-result.jpeg` |
 | DC Bias ถูกหลักวงจร มีหน่วยและสมมติฐานชัดเจน | 2 | `docs/validation.md`, ตารางผล + `Calculation details` + `Model Assumptions & Region Limits` บนหน้าเว็บ |
-| Automated Tests + Input Validation + Warning | 2 | `tests/` (16 เทสต์), `docs/test-log.txt`, `docs/screenshot-error.jpeg`, `docs/screenshot-warning.jpeg` |
+| Automated Tests + Input Validation + Warning | 2 | `tests/` (25 เทสต์), `docs/test-log.txt`, `docs/screenshot-error.jpeg`, `docs/screenshot-warning.jpeg` |
 | Review Code, GitHub Commit/Push, README, Reflection | 2 | `docs/code-review.md`, `docs/acceptance-checklist.md`, `docs/reflection.md`, commit history |
 
 ## Submission
 
-Commit and push with GitHub Desktop. Paste the repository URL and the
-latest commit SHA into Moodle together with a screenshot and the test log.
+- Repository (public): <https://github.com/pepo2391256-stack/-BJT-DC-Bias-Web-App>
+- Branch: `main` · the latest commit SHA is shown on the repository page
+- Evidence for the lab report: `docs/lab03-acceptance.md` + `docs/lab03/*.jpeg`
+
+Paste the repository URL and the latest commit SHA into Moodle together with
+a screenshot and the test log.
